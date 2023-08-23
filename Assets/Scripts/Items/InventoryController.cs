@@ -11,8 +11,14 @@
 		public int Money => money;
 		public int ItemsCount => items.Count;
 
-		public void SellAllItemsUpToValue(int maxValue)
+		/// <summary>
+		/// Sells every item from the inventory which value is lower than max value given in the parameter.
+		/// </summary>
+		/// <param name="maxValue"></param>
+		/// <returns>Returns additional amount of money added by this call if any (or 0).</returns>
+		public int SellAllItemsUpToValue(int maxValue)
 		{
+			int cachedMoneyAmount = money;
             for (var iItem = items.Count - 1; iItem >= 0; iItem--)
             {
                 var itemValue = items[iItem].Value;
@@ -23,19 +29,7 @@
                 items.RemoveAt(iItem);
             }
 
-			//items.RemoveAll(item => item.Value <= maxValue);
-
-            /* old solution
-			for (var i = 0; i < items.Count; i++)
-			{
-				var itemValue = items[i].Value;
-				if (itemValue > maxValue)
-					continue;
-				
-				money += itemValue;
-				items.RemoveAt(i);
-			}
-			*/
+			return money - cachedMoneyAmount;
         }
 
 		public void AddItem(Item item)

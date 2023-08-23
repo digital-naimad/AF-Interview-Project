@@ -6,14 +6,29 @@
 	public class ItemsManager : MonoBehaviour
 	{
 		[SerializeField] private InventoryController inventoryController;
-		[SerializeField] private int itemSellMaxValue;
+
+        [Range(0.0F, 1000.0F)]
+        [SerializeField] private int itemSellMaxValue;
+
 		[SerializeField] private Transform itemSpawnParent;
 		[SerializeField] private GameObject itemPrefab;
 		[SerializeField] private BoxCollider itemSpawnArea;
+
+		[Range(0.0F, 60.0F)]
 		[SerializeField] private float itemSpawnInterval;
 
-		private float nextItemSpawnTime;
-		
+        [SerializeField] private TextMeshProUGUI moneyIndicatorLabel;
+        [SerializeField] private string moneyLabelPrefix = "Money: ";
+
+        private float nextItemSpawnTime;
+
+        #region Life-cycle methods
+
+        private void Start()
+		{
+			moneyIndicatorLabel = FindObjectOfType<TextMeshProUGUI>();
+        }
+
 		private void Update()
 		{
 			if (Time.time >= nextItemSpawnTime)
@@ -21,14 +36,20 @@
 			
 			if (Input.GetMouseButtonDown(0))
 				TryPickUpItem();
-			
+
 			if (Input.GetKeyDown(KeyCode.Space))
-				inventoryController.SellAllItemsUpToValue(itemSellMaxValue);
+			{
+				if (inventoryController.SellAllItemsUpToValue(itemSellMaxValue) > 0)
+				{
+					UpdateMoneyLabel();
+				}
+			}
 
-			FindObjectOfType<TextMeshProUGUI>().text = "Money: " + inventoryController.Money;
-		}
+        }
 
-		private void SpawnNewItem()
+        #endregion
+
+        private void SpawnNewItem()
 		{
 			nextItemSpawnTime = Time.time + itemSpawnInterval;
 			
@@ -53,5 +74,13 @@
             inventoryController.AddItem(item);
             Debug.Log("Picked up " + item.Name + " with value of " + item.Value + " and now have " + inventoryController.ItemsCount + " items");
 		}
-	}
+
+		#region Private helper methods | TODO: move to the UI management class
+		private void UpdateMoneyLabel()
+		{
+            moneyIndicatorLabel.text = moneyLabelPrefix + inventoryController.Money;
+        }
+
+        #endregion
+    }
 }
