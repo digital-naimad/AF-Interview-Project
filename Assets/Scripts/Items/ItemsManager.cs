@@ -26,9 +26,6 @@
         [SerializeField] private TextMeshProUGUI moneyIndicatorLabel;
         [SerializeField] private string moneyLabelPrefix = "Money: ";
 
-		[SerializeField] private ItemEquipPromptController itemEquipPrompt;
-		[SerializeField] private InventoryPanelController inventoryPanel; 
-
         private float nextItemSpawnTime;
 
         #region Life-cycle methods
@@ -53,13 +50,6 @@
 					UpdateMoneyLabel();
 				}
 			}
-
-			/*
-            if (Input.GetKeyDown(KeyCode.I))
-			{
-
-			}
-			*/
         }
 
         #endregion
@@ -98,7 +88,6 @@
 			);
 
 			CreateItem(position);
-			//Instantiate(itemPrefab, position, Quaternion.identity, itemSpawnParent);
 		}
 
         private GameObject CreateItem(Vector3 position = default)

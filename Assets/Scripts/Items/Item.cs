@@ -9,14 +9,11 @@
 		[SerializeField] private string name;
 		[SerializeField] private int value;
         [SerializeField] private bool isConsumable;
-        //[SerializeField] private GameObject exchangeableItem;
 
         public string Name => name;
 		public int Value => value;
 
 		public bool IsConsumable => isConsumable != null;
-
-        //public bool IsConsumable => exchangeableItem != null;
 
         public Item(string name, int value)
 		{
