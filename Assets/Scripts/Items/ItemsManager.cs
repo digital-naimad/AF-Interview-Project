@@ -2,10 +2,13 @@
 {
 	using TMPro;
 	using UnityEngine;
+	using UnityEngine.UIElements;
 
 	public class ItemsManager : MonoBehaviour
 	{
 		[SerializeField] private InventoryController inventoryController;
+
+		[Header("Items")]
 
         [Range(0.0F, 1000.0F)]
         [SerializeField] private int itemSellMaxValue;
@@ -17,8 +20,14 @@
 		[Range(0.0F, 60.0F)]
 		[SerializeField] private float itemSpawnInterval;
 
+
+		[Header("UI elements")]
+
         [SerializeField] private TextMeshProUGUI moneyIndicatorLabel;
         [SerializeField] private string moneyLabelPrefix = "Money: ";
+
+		[SerializeField] private ItemEquipPromptController itemEquipPrompt;
+		[SerializeField] private InventoryPanelController inventoryPanel; 
 
         private float nextItemSpawnTime;
 
@@ -45,9 +54,37 @@
 				}
 			}
 
+			/*
+            if (Input.GetKeyDown(KeyCode.I))
+			{
+
+			}
+			*/
         }
 
         #endregion
+
+        #region Public methods 
+
+		public Item GetNewItem()
+		{
+			var newItemObject = CreateItem();
+            var itemHolder = newItemObject.GetComponent<IItemHolder>();
+            var newItem = itemHolder.GetItem(true);
+            return newItem;
+        }
+
+		public void EquipItem(Item item)
+		{
+            inventoryController.AddItem(item);
+        }
+
+		public void SellItem(Item item)
+		{
+			inventoryController.SellItem(item);
+		}
+
+        #endregion 
 
         private void SpawnNewItem()
 		{
@@ -59,11 +96,18 @@
 				0f,
 				Random.Range(spawnAreaBounds.min.z, spawnAreaBounds.max.z)
 			);
-			
-			Instantiate(itemPrefab, position, Quaternion.identity, itemSpawnParent);
+
+			CreateItem(position);
+			//Instantiate(itemPrefab, position, Quaternion.identity, itemSpawnParent);
 		}
 
-		private void TryPickUpItem()
+        private GameObject CreateItem(Vector3 position = default)
+        {
+            return Instantiate(itemPrefab, position, Quaternion.identity, itemSpawnParent);
+
+        }
+
+        private void TryPickUpItem()
 		{
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			var layerMask = LayerMask.GetMask("Item");
@@ -71,8 +115,18 @@
 				return;
 			
 			var item = itemHolder.GetItem(true);
-            inventoryController.AddItem(item);
-            Debug.Log("Picked up " + item.Name + " with value of " + item.Value + " and now have " + inventoryController.ItemsCount + " items");
+
+			if (item.IsConsumable)
+			{
+				//itemEquipPrompt.FullfillAndShowPrompt(item);
+				SellItem(item);
+			}
+			else
+			{
+				EquipItem(item);
+			}
+
+            Debug.Log("Picked up " + item.Name + (item.IsConsumable ? " (consumable)" : "") + " with value of " + item.Value + " and now have " + inventoryController.ItemsCount + " items");
 		}
 
 		#region Private helper methods | TODO: move to the UI management class

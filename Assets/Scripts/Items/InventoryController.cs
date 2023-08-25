@@ -19,18 +19,32 @@
 		public int SellAllItemsUpToValue(int maxValue)
 		{
 			int cachedMoneyAmount = money;
+
             for (var iItem = items.Count - 1; iItem >= 0; iItem--)
             {
-                var itemValue = items[iItem].Value;
-                if (itemValue > maxValue)
-                    continue;
-
-                money += itemValue;
-                items.RemoveAt(iItem);
+				if (items[iItem].Value <= maxValue)
+				{
+					SellItem(items[iItem]);
+				}
             }
 
 			return money - cachedMoneyAmount;
         }
+
+		/// <summary>
+		/// Adds item price (value) to the general amount of money.
+		/// Also removes item from the inventory list
+		/// </summary>
+		/// <param name="itemToSell"></param>
+		public void SellItem(Item itemToSell)
+		{
+			money += itemToSell.Value;
+
+			if (items.Contains(itemToSell))
+			{
+				items.Remove(itemToSell);
+			}
+		}
 
 		public void AddItem(Item item)
 		{
